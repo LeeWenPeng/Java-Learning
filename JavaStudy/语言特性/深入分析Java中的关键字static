@@ -1,0 +1,162 @@
+## static 关键字基本概念
+
+被static关键字修饰的不需要创建对象去调用，直接根据类名就可以去访问。
+
+### static 的特点
+
+1. static 是一个修饰符，用于修饰成员。其修饰的成员被称为静态变量或类变量
+2. static 修饰的成员被所有对象共享
+3. static 优先于对象的存在，因为其随着类的加载而存在
+4. static 修饰的成员可以直接通过类名调用，`类名.静态成员`
+5. static 修饰的数据是共享数据，存储在方法区；而对象中存储的数据是特有数据，存储在堆区
+
+## static 关键字修饰类
+
+普通类是不允许声明为静态的，只有内部类能被 static 修饰
+
+
+
+```java
+package org.staticTest;
+
+public class StaticTest {
+    public static class InnerClass{
+        InnerClass(){
+            System.out.println("静态内部类");
+        }
+        public void InnerMethod(){
+            System.out.println("静态内部方法");
+        }
+    }
+
+    static void main(String[] args) {
+        // 直接通过类名访问静态内部类
+        InnerClass innerClass = new StaticTest.InnerClass();
+        // 像普通类一样使用
+        innerClass.InnerMethod();
+    }
+}
+```
+
+- 通过 static 修饰内部类，使得内部类可以像普通类一样使用
+- 如果没有 static 修饰，那么只能先 new 一个外部类实例，再通过外部类实例创建内部类。
+
+## static 关键字修饰方法
+
+修饰方法时，可以直接通过类来调用
+
+```java
+package org.staticTest;
+
+public class StaticMethod {
+    public static void test(){
+        System.out.println("静态方法");
+    }
+
+    static void main(String[] args) {
+        // 方式一：直接通过类名
+        StaticMethod.test();
+        // 方式二：通过对象实例调用（不推荐）
+        StaticMethod fdd = new StaticMethod();
+        fdd.test();
+    }
+}
+```
+
+## static 关键字修饰变量
+
+- 被 static 修饰的成员变量叫做静态变量，也叫类变量，这个变量是属于这个类的，而不是属于对象实例
+- 没有被 static 修饰的成员变量叫做实例变量，这个变量是属于对象实例的
+
+```java
+package org.staticTest;
+
+public class StaticVar {
+    private static String name = "Java Lover";
+
+    static void main(String[] args) {
+        // 通过类名访问
+        System.out.println(StaticVar.name);
+    }
+}
+```
+
+### static 变量存放在方法区
+
+```java
+package org.test;
+
+public class Person {
+
+    static String firstName; // static
+    String lastName;
+
+    public void showName(){
+        System.out.println(firstName + lastName);
+    }
+
+    // static method
+    public static void viewName(){
+        System.out.println(firstName);
+    }
+
+    static void main(String[] args) {
+        Person p = new Person();
+        Person.firstName = "张";
+        p.lastName = "三";
+        p.showName();
+
+        Person p2 = new Person();
+        Person.firstName = "李";
+        p2.lastName = "四";
+        p2.showName();
+    }
+}
+```
+
+- 上述代码中，p 和 p2 是对象引用，存放在栈区
+- 与 p 和 p2 对应的是两个 Person 对象本身，存放在堆区
+- 对象的属性 p.lastname 和 p2.lastname 也存放在堆区
+- 静态方法 viewname 和静态变量 Person.firstname 存放在方法区
+- 其中，堆区内成员变量 lastname 是会随着对象的产生而产生，随着对象的回收而被释放
+- 方法区中的静态变量 firstname 是所有线程共享的，不会随着对象的回收而被释放
+
+### static 成员和普通成员变量的区别
+
+1. 生命周期不同
+   - 成员变量随着对象创建而存在，随着对象的回收而释放
+   - 静态成员随着类加载而存在，随着类的消失而消失
+2. 调用方式不同
+   - 成员变量只能通过类的实例对象调用
+   - 静态成员一般是通过类名调用，也可以通过类的实例对象调用（不推荐）
+3. 别名不同
+   - 成员变量的别名是实例变量
+   - 静态成员的别名是类变量
+
+### static 成员使用时需要注意的事项
+
+1. 静态方法只能访问静态成员：因为当静态方法加载时，实例变量一般还没有被创建。但反之，非静态方法可以访问静态成员和实例变量
+
+2. 静态方法中不可以使用 this 和 super 关键字：因为静态方法是绑定类的，而 this 和 super 是指向类的实例对象的。
+3. 主函数是静态的
+
+## static 修饰代码块
+
+静态代码块在类第一次被载入时执行
+
+
+
+类初始化的顺序
+
+1. 父类静态变量
+2. 父类静态代码块
+3. 子类静态变量
+4. 子类静态代码块
+5. 父类普通变量
+6. 父类普通代码块
+7. 父类构造函数
+8. 子类普通变量
+9. 子类普通代码块
+10. 子类构造函数
+
+1. 
